@@ -13,14 +13,45 @@ public class Exercise5 {
 
 	public static void main(String[] args) {
 		//testCrypt();
-		otpCrypt();
+		//otpCrypt();
+		crackCode();
+	}
+	private static void crackCode() {
+		Random generator;
+		for (int i = 0; i < 10000; i++) {
+			generator = new Random(i);
+			if (testRandomSeed(generator.nextInt())) {
+				System.out.println("Seed is: " + i);
+				//i = 10001;
+			}
+		}
+		
+	}
+	private static boolean testRandomSeed(int random) {
+		try {
+			OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream("outputSecret.txt"));
+			InputStreamReader reader = new InputStreamReader(new FileInputStream("secret.txt"));
+			int c;
+			while ((c = reader.read())>= 0) {
+				writer.write(crypt((char)c, random, false));
+			}
+			reader.close();
+			writer.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("File not found");
+			e.printStackTrace();
+		} catch (IOException e) {
+			System.out.println("Something went wrong");
+			e.printStackTrace();
+		}
+		return true;
 	}
 	private static void otpCrypt() {
 		Scanner scanner = new Scanner(System.in);
 		boolean crypt = false;
 		String input, output;
-		System.out.println("Do you want to encrypt or decrypt? (E/D)");
-		if (scanner.next() == "E") {
+		System.out.println("Do you want to encrypt or decrypt? (e/d)");
+		if (scanner.next() == "e") {
 			crypt = true;
 		}
 		System.out.println("Enter input filename:");
@@ -39,7 +70,7 @@ public class Exercise5 {
 			InputStreamReader reader = new InputStreamReader(new FileInputStream(input));
 			int c;
 			while ((c = reader.read())>= 0) {
-				writer.write(crypt((char)c, generator.nextInt(4711), crypt));
+				writer.write(crypt((char)c, generator.nextInt(96), crypt));
 			}
 			reader.close();
 			writer.close();
@@ -59,25 +90,23 @@ public class Exercise5 {
 		}
 	}
 	/**
-	 * When encrypt is true, function will encrypt a character. When encrypt is false, the function will decrypt a character.
+	 * When encrypt is true, the function will encrypt a character. When encrypt is false, the function will decrypt a character.
 	 * @param input
 	 * @param random
 	 * @param encrypt
 	 * @return Encrypted/decrypted character
 	 */
 	private static char crypt(char input, int random, boolean encrypt) {
-		assert random >= 0 | random <= 95 : "random is out of bounds";
-		char output = 0;
+		assert input >= 0;
 		if (input < 32 | input > 127) {
-			output = (char)input;
+			return (char)input;
 		} else {
 			if (encrypt) {
-				output = (char)((input - 32 + random + 96)%96 + 32);
+				return (char)((input - 32 + random + 96)%96 + 32);
 			} else {
-				output = (char)((input - 32 - random + 96)%96 + 32);
+				return (char)((input - 32 - random + 96)%96 + 32);
 			}
 		}
-		return output;
 	}
 
 }
